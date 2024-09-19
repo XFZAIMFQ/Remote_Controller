@@ -17,5 +17,6 @@ extern Sliding_Filter_TypeDef joysticks[JOYSTICK_VALUE];
 void init_joystick();
 void sliding_filter_joystick_value();
 float ConvertToJoystickValue(int adc, int min, int max, int center);
+float ConvertToTriggerValue(int adc, int min, int max);
 
 #endif //JOYSTICK_H

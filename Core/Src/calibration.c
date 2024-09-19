@@ -14,8 +14,19 @@ uint16_t recording_value = 0;
 Joystick_ADC joystick_x_adc = {4096, 0, 0};
 Joystick_ADC joystick_y_adc = {4096, 0, 0};
 
+Trigger_ADC trigger_1_adc = {4096, 0};
+Trigger_ADC trigger_2_adc = {4096, 0};
 
-void find_MaxAndMin(int lastest_x, int lastest_y) {
+
+void find_MaxAndMin(int lastest_x, int lastest_y, int lastest_t1, int lastest_t2) {
+
+    if (lastest_t1 > trigger_1_adc.max) {
+        joystick_x_adc.max = lastest_t1;
+    }
+    if (lastest_t2 > trigger_2_adc.max) {
+        joystick_x_adc.max = lastest_t2;
+    }
+
     if (lastest_x < joystick_x_adc.min) {
         joystick_x_adc.min = lastest_x;
     }
@@ -55,18 +66,26 @@ void calibration_joystick() {
     joystick_y_adc.min = 4096;
     joystick_y_adc.max = 0;
 
-    joystick_x_adc.center = dma_adc[2];
-    joystick_y_adc.center = dma_adc[1];
+    joystick_x_adc.center = dma_adc[1];
+    joystick_y_adc.center = dma_adc[0];
+
+    trigger_1_adc.min = dma_adc[2];
+    trigger_1_adc.max = 0;
+
+    trigger_2_adc.min = dma_adc[3];
+    trigger_2_adc.max = 0;
+
     while (1) {
-        find_MaxAndMin(dma_adc[2], dma_adc[1]);
+        find_MaxAndMin(dma_adc[2], dma_adc[1], dma_adc[3], dma_adc[0]);
         if (HAL_GPIO_ReadPin(BUTTON1_GPIO_Port, BUTTON1_Pin) == 0) {
             __disable_irq();
             uint32_t number[] = {
                     joystick_x_adc.min, joystick_x_adc.max, joystick_x_adc.center, joystick_y_adc.min,
-                    joystick_y_adc.max, joystick_y_adc.center
+                    joystick_y_adc.max, joystick_y_adc.center, trigger_1_adc.min, trigger_1_adc.max,
+                    trigger_2_adc.min, trigger_2_adc.max
             };
             char buffer[150];
-            char str[] = "Calibration Successful : {\"id\":%ld,\"adc_x_min\":%u,\"adc_x_max\":%u,\"adc_x_center\":%u,\"adc_y_min\":%u,\"adc_y_max\":%u,\"adc_y_center\":%u}\n";
+            char str[] = "Calibration Successful : {\"id\":%ld,\"adc_x_min\":%u,\"adc_x_max\":%u,\"adc_x_center\":%u,\"adc_y_min\":%u,\"adc_y_max\":%u,\"adc_y_center\":%u,\"adc_t1_min\":%u,\"adc_t1_max\":%u,\"adc_t2_min\":%u,\"adc_t2_max\":%u}\n";
             sprintf(buffer,
                     str,
                     *(__IO uint32_t *) (0X1FFFF7E8),
@@ -75,7 +94,11 @@ void calibration_joystick() {
                     joystick_x_adc.center,
                     joystick_y_adc.min,
                     joystick_y_adc.max,
-                    joystick_y_adc.center);
+                    joystick_y_adc.center,
+                    trigger_1_adc.min,
+                    trigger_1_adc.max,
+                    trigger_2_adc.min,
+                    trigger_2_adc.max);
             HAL_UART_Transmit(&huart1, (uint8_t *) buffer, strlen(buffer), 1000);
             Flash_Write(number, 6);
             __enable_irq();

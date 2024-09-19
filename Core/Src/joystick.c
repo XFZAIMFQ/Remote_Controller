@@ -34,3 +34,8 @@ float ConvertToJoystickValue(int adc, int min, int max, int center) {
         return 0;
     }
 }
+
+float ConvertToTriggerValue(int adc, int min, int max) {
+    return ConvertToJoystickValue(adc, 0, max, min);
+
+}

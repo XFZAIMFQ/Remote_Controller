@@ -18,8 +18,15 @@ typedef struct {
     uint16_t center;
 } Joystick_ADC;
 
+typedef struct {
+    uint16_t min;
+    uint16_t max;
+} Trigger_ADC;
+
 extern Joystick_ADC joystick_x_adc;
 extern Joystick_ADC joystick_y_adc;
+extern Trigger_ADC trigger_1_adc;
+extern Trigger_ADC trigger_2_adc;
 
 void calibration_joystick();
 void read_calibration_value();
