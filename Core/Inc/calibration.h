@@ -15,7 +15,8 @@ extern uint16_t recording_value;
 typedef struct {
     uint16_t min;
     uint16_t max;
-    uint16_t center;
+    uint16_t center_min;
+    uint16_t center_max;
 } Joystick_ADC;
 
 typedef struct {

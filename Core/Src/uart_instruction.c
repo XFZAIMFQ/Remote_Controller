@@ -39,7 +39,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef* huart) {
 
 // 假设的指令处理函数
 void ProcessReceivedCommand(char* command) {
-    if (strcmp(command, "0") == 0) {
+    if (strcmp(command, "g") == 0) {
         // 将数据写入FIFO
         handle_data data;
         for (int i = 0; i < BUTTON_NUM; ++i) {
